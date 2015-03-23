@@ -92,6 +92,29 @@ public class ResourceManager extends BaseGameActivity implements
 		return EO;
 	}
 
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+
+		// homeSceneSound.pause();
+		gameSceneSound.pause();
+		// mathSceneSound.pause();
+
+		super.onPause();
+	}
+
+	@Override
+	protected synchronized void onResume() {
+		// TODO Auto-generated method stub
+
+		// homeSceneSound.play();
+		if (gameSceneSound != null)
+			gameSceneSound.play();
+		// mathSceneSound.play();
+
+		super.onResume();
+	}
+
 	public void loadSplashResources() throws IOException {
 
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/images/");
