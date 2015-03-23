@@ -129,69 +129,69 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 				* 0.75f, RM.HEIGHT - scores.getHeight() * scores.getScaleY()
 				* 4.92f);
 		scores.setVisible(false);
+
+		button1.setOnClickListener(this);
+		button2.setOnClickListener(this);
+		button3.setOnClickListener(this);
+		button4.setOnClickListener(this);
+		button5.setOnClickListener(this);
+		button6.setOnClickListener(this);
+		button7.setOnClickListener(this);
+		button8.setOnClickListener(this);
+		button9.setOnClickListener(this);
+		button0.setOnClickListener(this);
+		retry.setOnClickListener(this);
+		scores.setOnClickListener(this);
 	}
 
 	public void populateIndividualScene() throws IOException {
 
 		numberOfInputs = 0;
 		sum = 0;
-        
-        if(RM.score / 100000 > 0) {
-            numberOfInputs = 0;
-        }
-        else if(RM.score / 10000 > 0) {
-            numberOfInputs = 1;
-        }
-        else if(RM.score / 1000 > 0) {
-            numberOfInputs = 2;
-        }
-        else if(RM.score / 100 > 0) {
-            numberOfInputs = 3;
-        }
-        else if(RM.score / 10 > 0) {
-            numberOfInputs = 4;
-        }
-        else if(RM.score >= 0) {
-            numberOfInputs = 5;
-        }
+
+		if (RM.score / 100000 > 0) {
+			numberOfInputs = 0;
+		} else if (RM.score / 10000 > 0) {
+			numberOfInputs = 1;
+		} else if (RM.score / 1000 > 0) {
+			numberOfInputs = 2;
+		} else if (RM.score / 100 > 0) {
+			numberOfInputs = 3;
+		} else if (RM.score / 10 > 0) {
+			numberOfInputs = 4;
+		} else if (RM.score >= 0) {
+			numberOfInputs = 5;
+		}
 
 		scene.attachChild(blackboardSprite);
 		scene.attachChild(button1);
 		scene.registerTouchArea(button1);
-		button1.setOnClickListener(this);
 		scene.attachChild(button2);
 		scene.registerTouchArea(button2);
-		button2.setOnClickListener(this);
 		scene.attachChild(button3);
 		scene.registerTouchArea(button3);
-		button3.setOnClickListener(this);
 		scene.attachChild(button4);
 		scene.registerTouchArea(button4);
-		button4.setOnClickListener(this);
 		scene.attachChild(button5);
 		scene.registerTouchArea(button5);
-		button5.setOnClickListener(this);
 		scene.attachChild(button6);
 		scene.registerTouchArea(button6);
-		button6.setOnClickListener(this);
 		scene.attachChild(button7);
 		scene.registerTouchArea(button7);
-		button7.setOnClickListener(this);
 		scene.attachChild(button8);
 		scene.registerTouchArea(button8);
-		button8.setOnClickListener(this);
 		scene.attachChild(button9);
 		scene.registerTouchArea(button9);
-		button9.setOnClickListener(this);
 		scene.attachChild(button0);
 		scene.registerTouchArea(button0);
-		button0.setOnClickListener(this);
 		scene.attachChild(retry);
 		scene.registerTouchArea(retry);
-		retry.setOnClickListener(this);
 		scene.attachChild(scores);
 		scene.registerTouchArea(scores);
-		scores.setOnClickListener(this);
+
+		// RM.mathSceneSound.play();
+		// RM.homeSceneSound.pause();
+		// RM.gameSceneSound.pause();
 	}
 
 	public void unpopulateIndividualScene(Scene scene) throws IOException {
@@ -222,7 +222,7 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 		scene.detachChild(scores);
 		scene.unregisterTouchArea(scores);
 	}
-	
+
 	private void placeLabel(String text, float distance, float yCoefficient) {
 		float xCoefficient = 0.63f;
 		Text label = new Text(
@@ -236,7 +236,8 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 		scene.attachChild(label);
 	}
 
-	private void placeLabel(String text, float distance, float yCoefficient, int color) {
+	private void placeLabel(String text, float distance, float yCoefficient,
+			int color) {
 		float xCoefficient = 0.63f;
 		Text label = new Text(
 				RM.WIDTH * xCoefficient - distance * 31 * scaleX,
@@ -246,9 +247,9 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 						.getVertexBufferObjectManager());
 		label.setScaleX(scaleX);
 		label.setScaleY(scaleY);
-		
+
 		label.setColor(color);
-		
+
 		scene.attachChild(label);
 	}
 
@@ -280,16 +281,17 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 			placeLabel(Integer.toString(number), distance, 1.5f);
 
 			double numberPlace = Math.pow(10, 6 - numberOfInputs);
-			double correctNumber = (int) ((int)RM.score % (numberPlace * 10)
-					/ (numberPlace));
+			double correctNumber = (int) ((int) RM.score % (numberPlace * 10) / (numberPlace));
 
 			int processedScore = 0;
 			if (number == correctNumber) {
-				placeLabel(Integer.toString((int) correctNumber), distance, 3, Color.GREEN);
+				placeLabel(Integer.toString((int) correctNumber), distance, 3,
+						Color.GREEN);
 				processedScore = number;
 				placeLabel(Integer.toString((int) number), distance, 4.5f);
 			} else {
-				placeLabel(Integer.toString((int) correctNumber), distance, 3, Color.RED);
+				placeLabel(Integer.toString((int) correctNumber), distance, 3,
+						Color.RED);
 				processedScore = 0;
 				placeLabel("0", distance, 4.5f);
 			}
@@ -332,7 +334,7 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 				}
 
 				placeLabel("(Total)", distance - 6, 7.5f);
-				
+
 				retry.setVisible(true);
 				scores.setVisible(true);
 			}
@@ -343,6 +345,7 @@ public class MathScene implements OnClickListener, IOnSceneTouchListener {
 	public void onClick(ButtonSprite button, float pTouchAreaLocalX,
 			float pTouchAreaLocalY) {
 		if (changeSceneListener != null) {
+			RM.buttonClicked.play();
 			if (button == retry) {
 				changeSceneListener.changeScene("gameScene");
 			} else if (button == scores) {

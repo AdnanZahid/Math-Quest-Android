@@ -2,6 +2,8 @@ package org.eu5.adnan_zahid;
 
 import java.io.IOException;
 
+import org.andengine.audio.music.Music;
+import org.andengine.audio.music.MusicFactory;
 import org.andengine.audio.sound.Sound;
 import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.Engine;
@@ -64,10 +66,10 @@ public class ResourceManager extends BaseGameActivity implements
 	public int coins = 0;
 	public int score = 0;
 
-	public Sound buttonClicked, coin, died, fadeOut, gameSceneSound,
-			greenScore, highScore, homeSceneSound, magnetSound, mathSceneSound,
-			negativeNumberSound, popSound, positiveNumberSound, redScoreSound,
-			shieldSound;
+	public Sound buttonClicked, coin, died, fadeOut, greenScore, highScore,
+			magnetSound, negativeNumberSound, popSound, positiveNumberSound,
+			redScoreSound, shieldSound;
+	public Music homeSceneSound, gameSceneSound, mathSceneSound;
 
 	public Engine getEngine() {
 		return mEngine;
@@ -82,8 +84,12 @@ public class ResourceManager extends BaseGameActivity implements
 		HEIGHT = displaymetrics.heightPixels;
 
 		camera = new Camera(0, 0, WIDTH, HEIGHT);
-		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
-				new RatioResolutionPolicy(WIDTH, HEIGHT), camera);
+		EngineOptions EO = new EngineOptions(true,
+				ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(
+						WIDTH, HEIGHT), camera);
+		EO.getAudioOptions().setNeedsSound(true);
+		EO.getAudioOptions().setNeedsMusic(true);
+		return EO;
 	}
 
 	public void loadSplashResources() throws IOException {
@@ -234,37 +240,39 @@ public class ResourceManager extends BaseGameActivity implements
 				"fonts/chalkboard-bold.ttf", 20, true,
 				android.graphics.Color.argb(255, 127, 127, 127));
 
-//		SoundFactory.setAssetBasePath("sounds/");
-// 		buttonClicked = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-// 				"Button.wav");
-//		coin = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-//				"Coin.wav");
-//		died = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-//				"Died.wav");
-//		fadeOut = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-//				"FadeOut.wav");
-//		gameSceneSound = SoundFactory.createSoundFromAsset(getSoundManager(),
-//				this, "GameScene.wav");
-//		greenScore = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-//				"GreenScore.wav");
-//		highScore = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-//				"Highscore.wav");
-//		homeSceneSound = SoundFactory.createSoundFromAsset(getSoundManager(),
-//				this, "Home.wav");
-//		magnetSound = SoundFactory.createSoundFromAsset(getSoundManager(),
-//				this, "Magnet.wav");
-//		mathSceneSound = SoundFactory.createSoundFromAsset(getSoundManager(),
-//				this, "MathScene.wav");
-//		negativeNumberSound = SoundFactory.createSoundFromAsset(
-//				getSoundManager(), this, "NegativeNumber.wav");
-//		popSound = SoundFactory.createSoundFromAsset(getSoundManager(), this,
-//				"Pop.wav");
-//		positiveNumberSound = SoundFactory.createSoundFromAsset(
-//				getSoundManager(), this, "PositiveNumber.wav");
-//		redScoreSound = SoundFactory.createSoundFromAsset(getSoundManager(),
-//				this, "RedScore.wav");
-//		shieldSound = SoundFactory.createSoundFromAsset(getSoundManager(),
-//				this, "Shield.wav");
+		SoundFactory.setAssetBasePath("sounds/");
+		buttonClicked = SoundFactory.createSoundFromAsset(getSoundManager(),
+				this, "Button.wav");
+		coin = SoundFactory.createSoundFromAsset(getSoundManager(), this,
+				"Coin.wav");
+		died = SoundFactory.createSoundFromAsset(getSoundManager(), this,
+				"Died.wav");
+		fadeOut = SoundFactory.createSoundFromAsset(getSoundManager(), this,
+				"FadeOut.wav");
+		greenScore = SoundFactory.createSoundFromAsset(getSoundManager(), this,
+				"GreenScore.wav");
+		highScore = SoundFactory.createSoundFromAsset(getSoundManager(), this,
+				"Highscore.wav");
+		magnetSound = SoundFactory.createSoundFromAsset(getSoundManager(),
+				this, "Magnet.wav");
+		negativeNumberSound = SoundFactory.createSoundFromAsset(
+				getSoundManager(), this, "NegativeNumber.wav");
+		popSound = SoundFactory.createSoundFromAsset(getSoundManager(), this,
+				"Pop.wav");
+		positiveNumberSound = SoundFactory.createSoundFromAsset(
+				getSoundManager(), this, "PositiveNumber.wav");
+		redScoreSound = SoundFactory.createSoundFromAsset(getSoundManager(),
+				this, "RedScore.wav");
+		shieldSound = SoundFactory.createSoundFromAsset(getSoundManager(),
+				this, "Shield.wav");
+
+		MusicFactory.setAssetBasePath("sounds/");
+		homeSceneSound = MusicFactory.createMusicFromAsset(getMusicManager(),
+				this, "Home.wav");
+		gameSceneSound = MusicFactory.createMusicFromAsset(getMusicManager(),
+				this, "GameScene.wav");
+		mathSceneSound = MusicFactory.createMusicFromAsset(getMusicManager(),
+				this, "MathScene.wav");
 
 		try {
 			splashTA.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(
@@ -430,10 +438,10 @@ public class ResourceManager extends BaseGameActivity implements
 			}
 		} else if (sceneName.equals("gameScene")) {
 			try {
+				gameScene.initComponents(scene);
 				homeScene.unpopulateIndividualScene(scene);
 				guideScene.unpopulateIndividualScene(scene);
 				mathScene.unpopulateIndividualScene(scene);
-				gameScene.initComponents(scene);
 				gameScene.populateIndividualScene();
 				mEngine.setScene(scene);
 			} catch (IOException e) {

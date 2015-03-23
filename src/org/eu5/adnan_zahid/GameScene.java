@@ -9,6 +9,7 @@ import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.MoveXModifier;
 import org.andengine.entity.modifier.MoveYModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.AutoParallaxBackground;
@@ -66,7 +67,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 	private Text progressLabel;
 
 	private AnimatedSprite heroSprite, shieldSprite, magnetSprite;
-	private Body heroBody, roofBody, groundBody;
+	private Body heroBody, roofBody, groundBody, leftBody;
 
 	private int playerVelocity;
 	private int distanceMoved;
@@ -130,8 +131,8 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 		this.scene = scene;
 
-		gravity = SensorManager.GRAVITY_JUPITER;
-		jumpHeight = gravity * 4;
+		gravity = SensorManager.GRAVITY_JUPITER * scaleY;
+		jumpHeight = gravity * 2 * scaleY;
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, -gravity), false);
 
@@ -229,6 +230,16 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				roofSprite, roofBody, true, false));
 
+		Rectangle leftSprite = new Rectangle(RM.WIDTH / 2, RM.HEIGHT / 2, 50,
+				RM.HEIGHT, RM.getVertexBufferObjectManager());
+		// scene.attachChild(leftSprite);
+
+		leftBody = PhysicsFactory.createBoxBody(this.mPhysicsWorld, leftSprite,
+				BodyType.KinematicBody, FIXTURE_DEF);
+		leftBody.setUserData(new UserData("LEFT", null));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				leftSprite, leftBody, true, false));
+
 		Sprite groundSprite = new Sprite(0, 0, RM.tacksTR,
 				RM.getVertexBufferObjectManager());
 		groundSprite.setScale(scaleX, scaleY);
@@ -283,6 +294,10 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				startingY + random.nextInt(maxRandom), 1);
 
 		addCoins();
+
+		// RM.gameSceneSound.play();
+		// RM.homeSceneSound.pause();
+		// RM.mathSceneSound.pause();
 	}
 
 	public void unpopulateIndividualScene(Scene scene) {
@@ -296,9 +311,16 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 		background.detachParallaxEntity(glassSpriteParallax);
 		background.detachParallaxEntity(progressSpriteParallax);
 
-		scene.detachChild(magnetSprite);
-		scene.detachChild(heroSprite);
-		scene.detachChild(shieldSprite);
+		scene.detachChildren();
+
+		heroBody.setActive(false);
+		mPhysicsWorld.destroyBody(heroBody);
+
+		roofBody.setActive(false);
+		mPhysicsWorld.destroyBody(roofBody);
+
+		groundBody.setActive(false);
+		mPhysicsWorld.destroyBody(groundBody);
 
 		RM.camera.setCenter(RM.WIDTH / 2, RM.HEIGHT / 2);
 
@@ -369,7 +391,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 								RM.getVertexBufferObjectManager());
 						pencilSprite.setScale(scaleX, scaleY);
 						pencilSprite.setPosition(X,
-								y + pencilSprite.getHeight() / 2);
+								y + pencilSprite.getHeight() * 0.75f);
 
 						Body pencilBody = PhysicsFactory.createBoxBody(
 								this.mPhysicsWorld, pencilSprite,
@@ -655,6 +677,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 			this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 					coinSprite, coinBody));
 
+			coinSprite.setUserData(new BodyData(coinBody));
 			coinSpriteArray.add(coinSprite);
 		}
 	}
@@ -772,57 +795,57 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"ROOF")) {
 
-				// if (!isShield && !isMagnet) {
-				// gameOver = true;
-				// } else {
-				// isShield = false;
-				// isMagnet = false;
-				//
-				// for (Sprite singleCoin : coinSpriteArray) {
-				// singleCoin.clearEntityModifiers();
-				// }
-				// }
+				if (!isShield && !isMagnet) {
+					gameOver = true;
+				} else {
+					isShield = false;
+					isMagnet = false;
+
+					for (Sprite singleCoin : coinSpriteArray) {
+						singleCoin.clearEntityModifiers();
+					}
+				}
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"ROOF")) {
 
-				// if (!isShield && !isMagnet) {
-				// gameOver = true;
-				// } else {
-				// isShield = false;
-				// isMagnet = false;
-				//
-				// for (Sprite singleCoin : coinSpriteArray) {
-				// singleCoin.clearEntityModifiers();
-				// }
-				// }
+				if (!isShield && !isMagnet) {
+					gameOver = true;
+				} else {
+					isShield = false;
+					isMagnet = false;
+
+					for (Sprite singleCoin : coinSpriteArray) {
+						singleCoin.clearEntityModifiers();
+					}
+				}
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"GROUND")) {
 
-//				if (!isShield && !isMagnet) {
-//					gameOver = true;
-//				} else {
-//					isShield = false;
-//					isMagnet = false;
-//					jump();
-//
-//					for (Sprite singleCoin : coinSpriteArray) {
-//						singleCoin.clearEntityModifiers();
-//					}
-//				}
+				if (!isShield && !isMagnet) {
+					gameOver = true;
+				} else {
+					isShield = false;
+					isMagnet = false;
+					jump();
+
+					for (Sprite singleCoin : coinSpriteArray) {
+						singleCoin.clearEntityModifiers();
+					}
+				}
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"GROUND")) {
 
-//				if (!isShield && !isMagnet) {
-//					gameOver = true;
-//				} else {
-//					isShield = false;
-//					isMagnet = false;
-//					jump();
-//
-//					for (Sprite singleCoin : coinSpriteArray) {
-//						singleCoin.clearEntityModifiers();
-//					}
-//				}
+				if (!isShield && !isMagnet) {
+					gameOver = true;
+				} else {
+					isShield = false;
+					isMagnet = false;
+					jump();
+
+					for (Sprite singleCoin : coinSpriteArray) {
+						singleCoin.clearEntityModifiers();
+					}
+				}
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"COIN")) {
 				bodyA.setActive(false);
@@ -832,6 +855,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				scene.detachChild(sprite);
 
 				coins++;
+				RM.coin.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"COIN")) {
 				bodyB.setActive(false);
@@ -841,6 +865,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				scene.detachChild(sprite);
 
 				coins++;
+				RM.coin.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"SHIELD")) {
 				bodyA.setActive(false);
@@ -851,6 +876,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				isShield = true;
 				isMagnet = false;
+				RM.shieldSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"SHIELD")) {
 				bodyB.setActive(false);
@@ -861,6 +887,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				isShield = true;
 				isMagnet = false;
+				RM.shieldSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"MAGNET")) {
 				bodyA.setActive(false);
@@ -871,6 +898,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				isMagnet = true;
 				isShield = false;
+				RM.magnetSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"MAGNET")) {
 				bodyB.setActive(false);
@@ -881,6 +909,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				isMagnet = true;
 				isShield = false;
+				RM.magnetSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"PLUS_1")) {
 				bodyA.setActive(false);
@@ -891,6 +920,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score++;
 				isShowScore = false;
+				RM.positiveNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"PLUS_1")) {
 				bodyB.setActive(false);
@@ -901,6 +931,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score++;
 				isShowScore = false;
+				RM.positiveNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"PLUS_10")) {
 				bodyA.setActive(false);
@@ -911,6 +942,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score += 10;
 				isShowScore = false;
+				RM.positiveNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"PLUS_10")) {
 				bodyB.setActive(false);
@@ -921,6 +953,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score += 10;
 				isShowScore = false;
+				RM.positiveNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"PLUS_100")) {
 				bodyA.setActive(false);
@@ -931,6 +964,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score += 100;
 				isShowScore = false;
+				RM.positiveNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"PLUS_100")) {
 				bodyB.setActive(false);
@@ -941,6 +975,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score += 100;
 				isShowScore = false;
+				RM.positiveNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"MINUS_1")) {
 				bodyA.setActive(false);
@@ -952,6 +987,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				if (score > 0)
 					score--;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"MINUS_1")) {
 				bodyB.setActive(false);
@@ -963,6 +999,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				if (score > 0)
 					score--;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"MINUS_10")) {
 				bodyA.setActive(false);
@@ -974,6 +1011,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				if (score > 9)
 					score -= 10;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"MINUS_10")) {
 				bodyB.setActive(false);
@@ -985,6 +1023,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				if (score > 9)
 					score -= 10;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"MINUS_100")) {
 				bodyA.setActive(false);
@@ -996,6 +1035,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				if (score > 99)
 					score -= 100;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"MINUS_100")) {
 				bodyB.setActive(false);
@@ -1007,6 +1047,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				if (score > 99)
 					score -= 100;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"DIVIDE_10")) {
 				bodyA.setActive(false);
@@ -1017,6 +1058,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score /= 10;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"DIVIDE_10")) {
 				bodyB.setActive(false);
@@ -1027,6 +1069,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score /= 10;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"DIVIDE_100")) {
 				bodyA.setActive(false);
@@ -1037,6 +1080,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score /= 100;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyB.getUserData()).getString().equals(
 					"DIVIDE_100")) {
 				bodyB.setActive(false);
@@ -1047,6 +1091,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				score /= 100;
 				isShowScore = false;
+				RM.negativeNumberSound.play();
 			} else if (((UserData) bodyA.getUserData()).getString().equals(
 					"CALCULATOR")) {
 				bodyA.setActive(false);
@@ -1147,10 +1192,28 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 				}
 			}
 		}
+		if (((UserData) bodyA.getUserData()).getString().equals("LEFT")) {
+			bodyA.setActive(false);
+			Sprite sprite = (Sprite) ((UserData) bodyA.getUserData())
+					.getSprite();
+			mPhysicsWorld.destroyBody(bodyA);
+			scene.detachChild(sprite);
+
+			isShowScore = true;
+		} else if (((UserData) bodyB.getUserData()).getString().equals("LEFT")) {
+			bodyB.setActive(false);
+			Sprite sprite = (Sprite) ((UserData) bodyB.getUserData())
+					.getSprite();
+			mPhysicsWorld.destroyBody(bodyB);
+			scene.detachChild(sprite);
+
+			isShowScore = true;
+		}
 	}
 
 	private void jump() {
 
+		RM.popSound.play();
 		heroBody.applyLinearImpulse(0, jumpHeight / 2,
 				heroBody.getWorldCenter().x, heroBody.getWorldCenter().y);
 	}
@@ -1197,10 +1260,32 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 					singleCoin.registerEntityModifier(moveTowardsPlayer);
 				}
 
+				ArrayList<Sprite> coinSpriteRemoveArray = new ArrayList<Sprite>();
+
 				for (Sprite singleCoin : coinSpriteArray) {
 					MoveXModifier moveTowardsPlayer = new MoveXModifier(10,
 							singleCoin.getX(), heroSprite.getX());
 					singleCoin.registerEntityModifier(moveTowardsPlayer);
+
+					if (singleCoin.collidesWith(heroSprite)) {
+
+						coinSpriteRemoveArray.add(singleCoin);
+
+						RM.coin.play();
+
+						Body coinBody = (Body) ((BodyData) singleCoin
+								.getUserData()).getBody();
+						coinBody.setActive(false);
+						mPhysicsWorld.destroyBody(coinBody);
+						scene.detachChild(singleCoin);
+
+						coins++;
+					}
+				}
+
+				for (Sprite removeSingleCoin : coinSpriteRemoveArray) {
+
+					coinSpriteArray.remove(removeSingleCoin);
 				}
 			}
 
@@ -1208,6 +1293,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 					heroBody.getLinearVelocity().y);
 			roofBody.setLinearVelocity(playerVelocity, 0);
 			groundBody.setLinearVelocity(playerVelocity, 0);
+			leftBody.setLinearVelocity(playerVelocity, 0);
 
 			if (isShowScore) {
 				progressLabel.setText("      Score: " + score + "      Coins: "
@@ -1256,16 +1342,26 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 
 				if (timeSinceShield >= 5) {
 					timeSinceShield = 0;
+					int randomBoolean = random.nextInt() % 2;
 					if (!isShield) {
-						addShield();
+						if (randomBoolean == 0) {
+							addShield();
+						}
+					}
+					if (!isMagnet) {
+						if (randomBoolean == 1) {
+							addMagnet();
+						}
 					}
 				}
+
 				if (timeSinceRuler >= 3) {
 					timeSinceRuler = 0;
 					addRuler();
 				}
 			}
 		} else {
+			RM.died.play();
 			RM.coins = coins;
 			RM.score = score;
 			changeSceneListener.changeScene("mathScene");
@@ -1277,6 +1373,7 @@ public class GameScene implements OnClickListener, IOnSceneTouchListener,
 			float pTouchAreaLocalY) {
 		// if(button == retry){
 		if (changeSceneListener != null) {
+			RM.buttonClicked.play();
 		}
 		// }
 	}

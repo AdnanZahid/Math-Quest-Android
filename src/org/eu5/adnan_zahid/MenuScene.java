@@ -55,19 +55,15 @@ public class MenuScene implements OnClickListener {
 
 		scene.attachChild(audio);
 		scene.registerTouchArea(audio);
-		audio.setOnClickListener(this);
 
 		scene.attachChild(highscores);
 		scene.registerTouchArea(highscores);
-		highscores.setOnClickListener(this);
 
 		scene.attachChild(difficulty);
 		scene.registerTouchArea(difficulty);
-		difficulty.setOnClickListener(this);
 
 		scene.attachChild(back);
 		scene.registerTouchArea(back);
-		back.setOnClickListener(this);
 	}
 	
 	public void unpopulateIndividualScene(Scene scene){
@@ -93,6 +89,7 @@ public class MenuScene implements OnClickListener {
 	public void onClick(ButtonSprite button, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
 		if(changeSceneListener!=null){
+			RM.buttonClicked.play();
 			if(button == audio) {
 				changeSceneListener.changeScene("audioScene");
 			}

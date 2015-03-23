@@ -65,6 +65,7 @@ public class DifficultyScene implements OnClickListener {
 	@Override
 	public void onClick(ButtonSprite button, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 		if(changeSceneListener!=null){
+			RM.buttonClicked.play();
 			if(button == back){
 				changeSceneListener.changeScene("menuScene");
 			}

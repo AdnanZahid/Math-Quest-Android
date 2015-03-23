@@ -77,6 +77,7 @@ public class AudioScene implements OnClickListener {
 	public void onClick(ButtonSprite button, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 		
 		if(changeSceneListener!=null){
+			RM.buttonClicked.play();
 			if(button == sound){
 			}
 			else if(button == music){

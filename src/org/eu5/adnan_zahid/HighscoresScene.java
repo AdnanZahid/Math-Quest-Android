@@ -79,6 +79,7 @@ public class HighscoresScene implements OnClickListener {
 	@Override
 	public void onClick(ButtonSprite button, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 		if(changeSceneListener!=null){
+			RM.buttonClicked.play();
 			if(button == gameCenter){
 			}
 			else if(button == back){
